@@ -1,0 +1,35 @@
+{
+  "name": "Vibe Code GLM Platform",
+  "short_name": "VCG Platform",
+  "description": "פלטפורמת ניהול תוכן מתקדמת עם AI - תמיכה ב-GLM 4.6, Gemini 2.5 ו-Minimax 2",
+  "id": "/",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#ffffff",
+  "theme_color": "#000000",
+  "lang": "he",
+  "dir": "rtl",
+  "categories": ["productivity", "business", "education"],
+  "icons": [
+    {
+      "src": "/icon-192x192.jpg",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-512x512.jpg",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-512x512-maskable.jpg",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}
