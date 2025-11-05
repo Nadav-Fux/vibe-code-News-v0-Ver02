@@ -2,6 +2,7 @@ import { NewsFlashFeed } from "@/components/news/news-flash-feed"
 import { Button } from "@/components/ui/button"
 import Link from "next/link"
 import { Footer } from "@/components/layout/footer"
+import { QuickAdminLogin } from "@/components/admin/quick-admin-login"
 
 export default function Home() {
   return (
@@ -10,6 +11,7 @@ export default function Home() {
       <header className="border-b bg-white/80 backdrop-blur-sm sticky top-0 z-50">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
           <nav className="flex items-center gap-4">
+            <QuickAdminLogin />
             <Link href="/auth/sign-up">
               <Button>הרשמה</Button>
             </Link>

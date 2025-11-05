@@ -27,7 +27,7 @@ export default function SignUpPage() {
     setError(null)
 
     if (password !== repeatPassword) {
-      setError("Passwords do not match")
+      setError("הסיסמאות אינן תואמות")
       setIsLoading(false)
       return
     }
@@ -60,7 +60,7 @@ export default function SignUpPage() {
 
       router.push("/auth/sign-up-success")
     } catch (error: unknown) {
-      setError(error instanceof Error ? error.message : "An error occurred")
+      setError(error instanceof Error ? error.message : "אירעה שגיאה בהרשמה")
     } finally {
       setIsLoading(false)
     }
@@ -72,41 +72,41 @@ export default function SignUpPage() {
         <div className="flex flex-col items-center gap-2 mb-8">
           <div className="h-12 w-12 rounded-xl bg-primary" />
           <h1 className="text-2xl font-bold">Vibe Code Platform</h1>
-          <p className="text-sm text-muted-foreground">Create your account</p>
+          <p className="text-sm text-muted-foreground">צור חשבון חדש</p>
         </div>
         <div className="flex flex-col gap-6">
           <Card className="border-2">
             <CardHeader>
-              <CardTitle className="text-2xl">Sign up</CardTitle>
-              <CardDescription>Create a new account</CardDescription>
+              <CardTitle className="text-2xl">הרשמה</CardTitle>
+              <CardDescription>צור חשבון חדש במערכת</CardDescription>
             </CardHeader>
             <CardContent>
               <form onSubmit={handleSignUp}>
                 <div className="flex flex-col gap-6">
                   <div className="grid gap-2">
-                    <Label htmlFor="display-name">Display Name</Label>
+                    <Label htmlFor="display-name">שם מלא</Label>
                     <Input
                       id="display-name"
                       type="text"
-                      placeholder="John Doe"
+                      placeholder="ישראל ישראלי"
                       required
                       value={displayName}
                       onChange={(e) => setDisplayName(e.target.value)}
                     />
                   </div>
                   <div className="grid gap-2">
-                    <Label htmlFor="email">Email</Label>
+                    <Label htmlFor="email">אימייל</Label>
                     <Input
                       id="email"
                       type="email"
-                      placeholder="m@example.com"
+                      placeholder="example@email.com"
                       required
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                     />
                   </div>
                   <div className="grid gap-2">
-                    <Label htmlFor="password">Password</Label>
+                    <Label htmlFor="password">סיסמה</Label>
                     <Input
                       id="password"
                       type="password"
@@ -116,7 +116,7 @@ export default function SignUpPage() {
                     />
                   </div>
                   <div className="grid gap-2">
-                    <Label htmlFor="repeat-password">Repeat Password</Label>
+                    <Label htmlFor="repeat-password">אימות סיסמה</Label>
                     <Input
                       id="repeat-password"
                       type="password"
@@ -127,13 +127,13 @@ export default function SignUpPage() {
                   </div>
                   {error && <p className="text-sm text-red-500">{error}</p>}
                   <Button type="submit" className="w-full" disabled={isLoading}>
-                    {isLoading ? "Creating an account..." : "Sign up"}
+                    {isLoading ? "יוצר חשבון..." : "הרשמה"}
                   </Button>
                 </div>
                 <div className="mt-4 text-center text-sm">
-                  Already have an account?{" "}
+                  כבר יש לך חשבון?{" "}
                   <Link href="/auth/login" className="underline underline-offset-4">
-                    Login
+                    התחבר
                   </Link>
                 </div>
               </form>
