@@ -20,21 +20,18 @@ const themeStyles = {
   whatsapp: {
     container: "bg-[#0a1014]",
     message: "bg-[#005c4b] text-white",
-    pinned: "bg-[#1f2c33] border-[#005c4b]",
     time: "text-gray-300",
     avatar: "bg-[#00a884]",
   },
   messenger: {
     container: "bg-gradient-to-b from-purple-50 to-blue-50",
     message: "bg-gradient-to-br from-purple-500 to-blue-500 text-white",
-    pinned: "bg-white border-purple-500 text-gray-900",
     time: "text-gray-700",
     avatar: "bg-gradient-to-br from-purple-600 to-blue-600",
   },
   minimal: {
     container: "bg-gray-50",
     message: "bg-white border border-gray-200 text-gray-900",
-    pinned: "bg-blue-50 border-blue-500 text-gray-900",
     time: "text-gray-600",
     avatar: "bg-blue-600",
   },
@@ -120,20 +117,15 @@ export function NewsFlashFeedClient({ flashes }: { flashes: NewsFlash[] }) {
                     VCG
                   </div>
 
-                  <div className="flex-1 space-y-2">
-                    <div
-                      className={cn(
-                        "rounded-2xl p-4 shadow-sm",
-                        flash.is_pinned ? cn(styles.pinned, "border-2") : styles.message,
-                      )}
-                    >
+                  <div className="flex-1 space-y-2 text-right">
+                    <div className={cn("rounded-2xl p-4", styles.message)}>
                       {flash.is_pinned && (
-                        <div className="flex items-center gap-2 mb-2 text-sm font-medium">
-                          <Pin className="w-4 h-4" />
+                        <div className="flex items-center gap-2 mb-2 text-sm font-medium justify-end opacity-80">
                           <span>הודעה נעוצה</span>
+                          <Pin className="w-4 h-4" />
                         </div>
                       )}
-                      <p className="text-base leading-relaxed whitespace-pre-wrap">{flash.content}</p>
+                      <p className="text-base leading-relaxed whitespace-pre-wrap text-right">{flash.content}</p>
                       {flash.image_url && (
                         <div className="mt-3 rounded-lg overflow-hidden">
                           <Image
@@ -147,9 +139,9 @@ export function NewsFlashFeedClient({ flashes }: { flashes: NewsFlash[] }) {
                       )}
                     </div>
 
-                    <div className={cn("flex items-center gap-1 text-xs", styles.time)}>
-                      <Clock className="w-3 h-3" />
+                    <div className={cn("flex items-center gap-1 text-xs justify-end", styles.time)}>
                       <span>{formatTime(flash.created_at)}</span>
+                      <Clock className="w-3 h-3" />
                     </div>
                   </div>
                 </motion.div>

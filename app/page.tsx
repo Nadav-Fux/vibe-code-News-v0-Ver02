@@ -9,20 +9,20 @@ export default function Home() {
       {/* Header */}
       <header className="border-b bg-white/80 backdrop-blur-sm sticky top-0 z-50">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-          <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-            Vibe Code GLM
-          </h1>
           <nav className="flex items-center gap-4">
-            <Link href="/articles">
-              <Button variant="ghost">מאמרים</Button>
+            <Link href="/auth/sign-up">
+              <Button>הרשמה</Button>
             </Link>
             <Link href="/auth/login">
               <Button variant="ghost">כניסה</Button>
             </Link>
-            <Link href="/auth/sign-up">
-              <Button>הרשמה</Button>
+            <Link href="/articles">
+              <Button variant="ghost">מאמרים</Button>
             </Link>
           </nav>
+          <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+            Vibe Code GLM
+          </h1>
         </div>
       </header>
 
