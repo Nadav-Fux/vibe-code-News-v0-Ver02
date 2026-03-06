@@ -12,6 +12,12 @@ export const AI_MODELS = {
     model: "glm-4-flash",
     apiKey: process.env.GLM_API_KEY,
   },
+  groq: {
+    name: "Groq LLaMA 70B",
+    provider: "groq",
+    model: "llama-3.3-70b-versatile",
+    apiKey: process.env.GROQ_API_KEY,
+  },
   minimax: {
     name: "Minimax 2",
     provider: "minimax",
