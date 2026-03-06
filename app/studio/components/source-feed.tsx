@@ -56,11 +56,11 @@ function timeAgo(dateStr: string): string {
   const diff = Date.now() - new Date(dateStr).getTime();
   const minutes = Math.floor(diff / 60_000);
   if (minutes < 1) return "עכשיו";
-  if (minutes < 60) return \`לפני \${minutes} דק׳\`;
+  if (minutes < 60) return `לפני ${minutes} דק׳`;
   const hours = Math.floor(minutes / 60);
-  if (hours < 24) return \`לפני \${hours} שע׳\`;
+  if (hours < 24) return `לפני ${hours} שע׳`;
   const days = Math.floor(hours / 24);
-  return \`לפני \${days} ימים\`;
+  return `לפני ${days} ימים`;
 }
 
 // ── Animation variants ───────────────────────────────────────
@@ -98,7 +98,7 @@ export default function SourceFeed({
   layout = "vertical",
 }: SourceFeedProps) {
   // Self-managed state when props aren't provided
-  const { sources } = useSources();
+  const { items: sources } = useSources();
   const [internalFilter, setInternalFilter] = useState("all");
   const [internalSelected, setInternalSelected] = useState<Set<string>>(new Set());
 
@@ -177,7 +177,7 @@ export default function SourceFeed({
                         checked={isSelected}
                         onCheckedChange={() => onToggle(item)}
                         className="mt-1 shrink-0"
-                        aria-label={\`בחר \${item.title}\`}
+                        aria-label={`בחר ${item.title}`}
                       />
                       <div className="min-w-0 flex-1 space-y-1.5">
                         <div className="flex flex-wrap items-center gap-2 text-xs">

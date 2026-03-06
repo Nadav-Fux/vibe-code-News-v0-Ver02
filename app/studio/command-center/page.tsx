@@ -45,7 +45,7 @@ const fadeUp = {
 export default function CommandCenterPage() {
   const [filter, setFilter] = useState<Filter>('הכל')
   const [topic, setTopic] = useState('')
-  const { sources } = useSources()
+  const { items: sources } = useSources()
   const { generate, isGenerating } = useGenerate()
   const { history } = useStudio()
 

@@ -130,7 +130,7 @@ export default function FlowPage() {
   const [configReady, setConfigReady] = useState(false)
   const [topic, setTopic] = useState('')
   const { generate, isGenerating, output } = useGenerate()
-  const { sources } = useSources()
+  const { items: sources } = useSources()
 
   const generateDone = !!output
 

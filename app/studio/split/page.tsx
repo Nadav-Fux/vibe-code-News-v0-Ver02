@@ -49,7 +49,7 @@ export default function SplitPage() {
   const [copied, setCopied] = useState(false)
 
   const { generate, isGenerating, output } = useGenerate()
-  const { sources } = useSources()
+  const { items: sources } = useSources()
 
   const toggleFilter = (f: string) =>
     setSelectedFilters((prev) =>
