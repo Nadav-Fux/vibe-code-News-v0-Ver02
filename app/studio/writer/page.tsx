@@ -31,7 +31,7 @@ import {
   Megaphone,
 } from 'lucide-react'
 
-import { SourceFeed } from '../components/source-feed'
+import SourceFeed from '../components/source-feed'
 import { useGenerate } from '../hooks/use-generate'
 import { useStudio } from '../hooks/use-studio-store'
 

@@ -23,10 +23,10 @@ import {
   Check,
 } from 'lucide-react'
 
-import { SourceFeed } from '../components/source-feed'
-import { GenerationControls } from '../components/generation-controls'
-import { OutputPreview } from '../components/output-preview'
-import { PlatformBadge } from '../components/platform-badge'
+import SourceFeed from '../components/source-feed'
+import GenerationControls from '../components/generation-controls'
+import OutputPreview from '../components/output-preview'
+import PlatformBadge from '../components/platform-badge'
 import { useGenerate } from '../hooks/use-generate'
 import { useSources } from '../hooks/use-sources'
 

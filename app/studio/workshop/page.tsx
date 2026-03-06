@@ -25,9 +25,9 @@ import {
   Inbox,
 } from 'lucide-react'
 
-import { SourceFeed } from '../components/source-feed'
-import { GenerationControls } from '../components/generation-controls'
-import { ContentCard } from '../components/content-card'
+import SourceFeed from '../components/source-feed'
+import GenerationControls from '../components/generation-controls'
+import ContentCard from '../components/content-card'
 import { useGenerate } from '../hooks/use-generate'
 import { useSources } from '../hooks/use-sources'
 import { useStudio } from '../hooks/use-studio-store'

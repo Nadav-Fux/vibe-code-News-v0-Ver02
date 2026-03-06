@@ -1,70 +1,92 @@
-'use client';
-
-import { useCompletion } from 'ai/react';
-import { useState, useCallback } from 'react';
-import type { PlatformKey } from '../lib/platforms';
-import { getPromptForPlatform } from '../lib/platforms';
+"use client"
+import { useState, useCallback, useRef } from "react"
+import type { PlatformKey } from "../lib/platforms"
+import { getPromptForPlatform } from "../lib/platforms"
 
 export interface GenerationRecord {
-  content: string;
-  platform: PlatformKey;
-  llm: string;
-  createdAt: string;
+  id: string
+  content: string
+  platform: PlatformKey
+  llm: string
+  createdAt: string
 }
 
 export interface GenerateOptions {
-  topic: string;
-  platform: PlatformKey;
-  llm: string;
-  tone?: string;
-  depth?: string;
-  style?: string;
-  sourceContext?: string;
+  topic: string
+  platform: PlatformKey
+  llm: string
+  tone?: string
+  depth?: string
+  style?: string
+  sourceContext?: string
 }
 
 export function useGenerate() {
-  const [lastGeneration, setLastGeneration] = useState<GenerationRecord | null>(null);
+  const [completion, setCompletion] = useState("")
+  const [isLoading, setIsLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+  const [lastGeneration, setLastGeneration] = useState<GenerationRecord | null>(null)
+  const abortRef = useRef<AbortController | null>(null)
 
-  const { completion, complete, isLoading, error, stop } = useCompletion({
-    api: '/api/studio/generate',
-  });
+  const generate = useCallback(async (opts: GenerateOptions) => {
+    setIsLoading(true)
+    setError(null)
+    setCompletion("")
 
-  const generate = useCallback(
-    async (opts: GenerateOptions) => {
-      const tone = opts.tone || 'professional';
-      const depth = opts.depth || 'medium';
+    const prompt = getPromptForPlatform(
+      opts.platform, opts.topic, opts.tone || "professional",
+      opts.depth || "medium", opts.sourceContext
+    )
 
-      const prompt = getPromptForPlatform(
-        opts.platform,
-        opts.topic,
-        tone,
-        depth,
-        opts.sourceContext,
-      );
+    abortRef.current = new AbortController()
 
-      const result = await complete(prompt, {
-        body: {
-          model: opts.llm,
-          platform: opts.platform,
-          tone,
-          depth,
-          style: opts.style,
-        },
-      });
+    try {
+      const res = await fetch("/api/studio/generate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          prompt, model: opts.llm, platform: opts.platform,
+          tone: opts.tone, depth: opts.depth, style: opts.style,
+        }),
+        signal: abortRef.current.signal,
+      })
 
-      if (result) {
-        setLastGeneration({
-          content: result,
-          platform: opts.platform,
-          llm: opts.llm,
-          createdAt: new Date().toISOString(),
-        });
+      if (!res.ok) throw new Error("Generation failed")
+      if (!res.body) throw new Error("No response body")
+
+      const reader = res.body.getReader()
+      const decoder = new TextDecoder()
+      let full = ""
+
+      while (true) {
+        const { done, value } = await reader.read()
+        if (done) break
+        const chunk = decoder.decode(value, { stream: true })
+        full += chunk
+        setCompletion(full)
       }
 
-      return result;
-    },
-    [complete],
-  );
+      const record: GenerationRecord = {
+        id: crypto.randomUUID(),
+        content: full,
+        platform: opts.platform,
+        llm: opts.llm,
+        createdAt: new Date().toISOString(),
+      }
+      setLastGeneration(record)
+      return full
+    } catch (e: any) {
+      if (e.name !== "AbortError") setError(e.message)
+      return null
+    } finally {
+      setIsLoading(false)
+      abortRef.current = null
+    }
+  }, [])
 
-  return { completion, generate, isLoading, error, stop, lastGeneration };
+  const stop = useCallback(() => {
+    abortRef.current?.abort()
+  }, [])
+
+  return { completion, generate, isLoading, error, stop, lastGeneration }
 }
