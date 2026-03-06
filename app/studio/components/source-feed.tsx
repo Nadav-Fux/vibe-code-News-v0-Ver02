@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo } from "react";
+import { useState, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Rss, Search, Twitter, Bot, Filter } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -9,6 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { cn } from "@/lib/utils";
+import { useSources } from "../hooks/use-sources";
 import type { SourceItem } from "../hooks/use-sources";
 
 // ── Source type visual config ────────────────────────────────
@@ -55,75 +56,84 @@ function timeAgo(dateStr: string): string {
   const diff = Date.now() - new Date(dateStr).getTime();
   const minutes = Math.floor(diff / 60_000);
   if (minutes < 1) return "עכשיו";
-  if (minutes < 60) return `לפני ${minutes} דק׳`;
+  if (minutes < 60) return \`לפני \${minutes} דק׳\`;
   const hours = Math.floor(minutes / 60);
-  if (hours < 24) return `לפני ${hours} שע׳`;
+  if (hours < 24) return \`לפני \${hours} שע׳\`;
   const days = Math.floor(hours / 24);
-  return `לפני ${days} ימים`;
+  return \`לפני \${days} ימים\`;
 }
 
 // ── Animation variants ───────────────────────────────────────
 const listVariants = {
   hidden: {},
-  visible: {
-    transition: { staggerChildren: 0.06 },
-  },
+  visible: { transition: { staggerChildren: 0.06 } },
 };
 
 const itemVariants = {
   hidden: { opacity: 0, y: 18, scale: 0.97 },
   visible: {
-    opacity: 1,
-    y: 0,
-    scale: 1,
+    opacity: 1, y: 0, scale: 1,
     transition: { type: "spring", stiffness: 320, damping: 28 },
   },
   exit: { opacity: 0, y: -10, transition: { duration: 0.18 } },
 };
 
-// ── Props ────────────────────────────────────────────────────
+// ── Props (all optional — component is self-contained) ───────
 interface SourceFeedProps {
-  items: SourceItem[];
-  onToggle: (item: SourceItem) => void;
-  selectedIds: Set<string>;
-  filter: string;
-  onFilterChange: (value: string) => void;
+  items?: SourceItem[];
+  onToggle?: (item: SourceItem) => void;
+  selectedIds?: Set<string>;
+  filter?: string;
+  onFilterChange?: (value: string) => void;
+  layout?: "vertical" | "horizontal";
 }
 
 // ── Component ────────────────────────────────────────────────
 export default function SourceFeed({
-  items,
-  onToggle,
-  selectedIds,
-  filter,
-  onFilterChange,
+  items: externalItems,
+  onToggle: externalOnToggle,
+  selectedIds: externalSelectedIds,
+  filter: externalFilter,
+  onFilterChange: externalOnFilterChange,
+  layout = "vertical",
 }: SourceFeedProps) {
+  // Self-managed state when props aren't provided
+  const { sources } = useSources();
+  const [internalFilter, setInternalFilter] = useState("all");
+  const [internalSelected, setInternalSelected] = useState<Set<string>>(new Set());
+
+  const items = externalItems ?? sources ?? [];
+  const filter = externalFilter ?? internalFilter;
+  const onFilterChange = externalOnFilterChange ?? setInternalFilter;
+  const selectedIds = externalSelectedIds ?? internalSelected;
+  const onToggle = externalOnToggle ?? ((item: SourceItem) => {
+    setInternalSelected(prev => {
+      const next = new Set(prev);
+      if (next.has(item.id)) next.delete(item.id);
+      else next.add(item.id);
+      return next;
+    });
+  });
+
   const filtered = useMemo(
-    () =>
-      filter === "all"
-        ? items
-        : items.filter((i) => i.source_type === filter),
+    () => filter === "all" ? items : items.filter((i) => i.source_type === filter),
     [items, filter],
   );
 
   return (
-    <div className="flex h-full flex-col gap-3">
-      {/* ── Filter tabs ─────────────────────────────────── */}
+    <div className={cn("flex h-full gap-3", layout === "horizontal" ? "flex-row overflow-x-auto" : "flex-col")}>
+      {/* ── Filter tabs */}
       <Tabs value={filter} onValueChange={onFilterChange}>
         <TabsList className="w-full justify-start gap-1 bg-muted/40 p-1">
           {filterTabs.map((tab) => (
-            <TabsTrigger
-              key={tab.value}
-              value={tab.value}
-              className="text-xs data-[state=active]:bg-background"
-            >
+            <TabsTrigger key={tab.value} value={tab.value} className="text-xs data-[state=active]:bg-background">
               {tab.label}
             </TabsTrigger>
           ))}
         </TabsList>
       </Tabs>
 
-      {/* ── Selected counter ────────────────────────────── */}
+      {/* ── Selected counter */}
       {selectedIds.size > 0 && (
         <div className="flex items-center gap-2 rounded-md bg-primary/10 px-3 py-1.5 text-xs text-primary">
           <Filter className="h-3 w-3" />
@@ -131,11 +141,11 @@ export default function SourceFeed({
         </div>
       )}
 
-      {/* ── Scrollable feed ─────────────────────────────── */}
+      {/* ── Scrollable feed */}
       <ScrollArea className="flex-1" dir="rtl">
         <AnimatePresence mode="popLayout">
           <motion.div
-            className="flex flex-col gap-2 pe-3"
+            className={cn("flex gap-2", layout === "horizontal" ? "flex-row" : "flex-col pe-3")}
             variants={listVariants}
             initial="hidden"
             animate="visible"
@@ -153,57 +163,34 @@ export default function SourceFeed({
               const isSelected = selectedIds.has(item.id);
 
               return (
-                <motion.div
-                  key={item.id}
-                  variants={itemVariants}
-                  layout
-                  layoutId={item.id}
-                >
+                <motion.div key={item.id} variants={itemVariants} layout layoutId={item.id}>
                   <Card
                     className={cn(
                       "cursor-pointer border transition-colors hover:border-primary/40",
                       isSelected && "border-primary/60 bg-primary/5",
+                      layout === "horizontal" && "min-w-[220px]",
                     )}
                     onClick={() => onToggle(item)}
                   >
                     <CardContent className="flex items-start gap-3 p-3">
-                      {/* Checkbox */}
                       <Checkbox
                         checked={isSelected}
                         onCheckedChange={() => onToggle(item)}
                         className="mt-1 shrink-0"
-                        aria-label={`בחר ${item.title}`}
+                        aria-label={\`בחר \${item.title}\`}
                       />
-
-                      {/* Content */}
                       <div className="min-w-0 flex-1 space-y-1.5">
-                        {/* Top row: badge + source + time */}
                         <div className="flex flex-wrap items-center gap-2 text-xs">
-                          <Badge
-                            variant="outline"
-                            className={cn("gap-1 px-1.5 py-0", cfg.badgeBg)}
-                          >
+                          <Badge variant="outline" className={cn("gap-1 px-1.5 py-0", cfg.badgeBg)}>
                             <Icon className="h-3 w-3" />
                             {cfg.label}
                           </Badge>
-                          <span className="text-muted-foreground">
-                            {item.source_name}
-                          </span>
-                          <span className="me-auto text-muted-foreground/60">
-                            {timeAgo(item.fetched_at)}
-                          </span>
+                          <span className="text-muted-foreground">{item.source_name}</span>
+                          <span className="me-auto text-muted-foreground/60">{timeAgo(item.fetched_at)}</span>
                         </div>
-
-                        {/* Title */}
-                        <p className="line-clamp-1 text-sm font-medium leading-snug">
-                          {item.title}
-                        </p>
-
-                        {/* Snippet */}
+                        <p className="line-clamp-1 text-sm font-medium leading-snug">{item.title}</p>
                         {item.content && (
-                          <p className="line-clamp-2 text-xs leading-relaxed text-muted-foreground">
-                            {item.content}
-                          </p>
+                          <p className="line-clamp-2 text-xs leading-relaxed text-muted-foreground">{item.content}</p>
                         )}
                       </div>
                     </CardContent>
